@@ -3,7 +3,7 @@ set -e
 
 #sudo apt install build-essential autoconf autoconf-archive nasm wget git fuse x11-utils \
 #  libboost-all-dev libsdl2-dev libsdl2-image-dev libsdl2-net-dev libsdl2-ttf-dev \
-#  libzzip-dev zlib1g-dev libpng-dev libva-dev libvdpau-dev \
+#  libzzip-dev zlib1g-dev libpng-dev libvpx-dev libvorbis-dev \
 #  libcurl4-gnutls-dev libminiupnpc-dev libopenal-dev libsndfile1-dev
 
 #libsmpeg-dev libavcodec-dev libavformat-dev libavutil-dev libswscale-dev
@@ -16,6 +16,7 @@ export LD_LIBRARY_PATH="$PWD/ffmpeg/usr/lib:$LD_LIBRARY_PATH"
 export PKG_CONFIG_PATH="$PWD/ffmpeg/usr/lib/pkgconfig"
 
 # build FFmpeg from source to avoid unneeded dependencies
+# https://github.com/Aleph-One-Marathon/mac-frameworks/blob/master/ffmpeg/ffmpeg.mk
 if [ ! -d ffmpeg ]; then
     git clone --depth 5000 https://github.com/FFmpeg/FFmpeg ffmpeg
 fi
@@ -28,6 +29,54 @@ if [ ! -f ffmpeg/usr/lib/pkgconfig/libavcodec.pc ]; then
         --enable-version3 \
         --disable-static \
         --enable-shared \
+        --enable-postproc \
+        --enable-libvorbis \
+        --enable-libvpx \
+        --disable-everything \
+        --enable-muxer=webm \
+        --enable-encoder=libvorbis \
+        --enable-encoder=libvpx_vp8 \
+        --enable-demuxer=aiff \
+        --enable-demuxer=mp3 \
+        --enable-demuxer=mpegps \
+        --enable-demuxer=mpegts \
+        --enable-demuxer=mpegtsraw \
+        --enable-demuxer=mpegvideo \
+        --enable-demuxer=ogg \
+        --enable-demuxer=wav \
+        --enable-parser=mpegaudio \
+        --enable-parser=mpegvideo \
+        --enable-decoder=adpcm_ima_wav \
+        --enable-decoder=adpcm_ms \
+        --enable-decoder=gsm \
+        --enable-decoder=gsm_ms \
+        --enable-decoder=mp1 \
+        --enable-decoder=mp1float \
+        --enable-decoder=mp2 \
+        --enable-decoder=mp2float \
+        --enable-decoder=mp3 \
+        --enable-decoder=mp3float \
+        --enable-decoder=mpeg1video \
+        --enable-decoder=pcm_alaw \
+        --enable-decoder=pcm_f32be \
+        --enable-decoder=pcm_f32le \
+        --enable-decoder=pcm_f64be \
+        --enable-decoder=pcm_f64le \
+        --enable-decoder=pcm_mulaw \
+        --enable-decoder=pcm_s8 \
+        --enable-decoder=pcm_s8_planar \
+        --enable-decoder=pcm_s16be \
+        --enable-decoder=pcm_s16le \
+        --enable-decoder=pcm_s16le_planar \
+        --enable-decoder=pcm_s24be \
+        --enable-decoder=pcm_s24le \
+        --enable-decoder=pcm_s32be \
+        --enable-decoder=pcm_s32le \
+        --enable-decoder=pcm_u8 \
+        --enable-decoder=theora \
+        --enable-decoder=vorbis \
+        --enable-decoder=vp8 \
+        --enable-protocol=file \
     | tee config.log
     make -j$(nproc)
     make install
